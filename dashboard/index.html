@@ -1,16 +1,67 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Token Radar — pre-token protocols ranked by implied value</title>
-<meta name="description" content="A radar for token launches: 200 pre-token protocols ranked by an implied value calibrated from the snapshot's own tokened comparables, each with a farm plan.">
+<title>Token Launch Radar — top 200 tokenless protocols by implied launch value</title>
 <link rel="stylesheet" href="app.css">
 </head>
 <body>
-<a class="skip" href="#board">Skip to the board</a>
-<main id="board" tabindex="-1" aria-busy="true"></main>
-<script src="../data.js"></script>
+<div class="wrap">
+  <header>
+    <h1>Token Launch Radar</h1>
+    <p class="sub">Top 200 tokenless protocols by implied launch value</p>
+    <p class="meta">Snapshot: 14 November 2026 &middot; DefiLlama &middot; <span id="rowTotal">200 protocols</span> &middot; implied value = what a token would be worth if the protocol's record stayed as it is</p>
+  </header>
+
+  <section class="panel method">
+    <h2>How the ranking works</h2>
+    <ol>
+      <li>Category multiple: median mcap/TVL of tokened protocols in the same category, winsorized to the global [p25, p75] and shrunk toward the global median with a prior of 5 — so a category with 1 comparable cannot dominate the board.</li>
+      <li>Size: min(1, (100M/TVL)^0.12) — smaller protocols are discounted.</li>
+      <li>Growth is RELATIVE: a protocol's 7d change minus its category median, clamped to [-50, 100], scaled by 0.4 — so a protocol is judged against its own category, not the market.</li>
+      <li>Maturity: 0.65 + min(age, 1095)/1095 &times; 0.35 — older protocols without a token score higher.</li>
+    </ol>
+    <p>Implied value = TVL &times; multiple &times; size &times; growth &times; maturity. Every number comes from the DefiLlama snapshot; no protocol name is hardcoded.</p>
+    <p class="board-note">The board covers the 40 watchlist protocols plus the 160 largest other tokenless protocols, excluding exchange and bridge products, staking wrappers, basis-trading and prediction-market products, managed curator vaults, and versioned (V2/V3) forks.</p>
+  </section>
+
+  <section class="panel top10">
+    <h2>Why the top 10 lead</h2>
+    <ol id="top10"></ol>
+  </section>
+
+  <section class="controls">
+    <input id="search" type="search" placeholder="Search name or slug…" aria-label="Search protocols">
+    <select id="catFilter" aria-label="Filter by category"><option value="">All categories</option></select>
+    <label class="check"><input id="watchOnly" type="checkbox"> Watchlist only</label>
+    <select id="sortBy" aria-label="Sort by">
+      <option value="implied">Sort: Implied value</option>
+      <option value="tvl">Sort: TVL</option>
+      <option value="growth">Sort: 7d growth</option>
+      <option value="age">Sort: Age</option>
+    </select>
+    <span id="rowCount" class="count">200 rows shown</span>
+  </section>
+
+  <div class="tablewrap">
+    <table id="board">
+      <thead><tr>
+        <th>Rank</th><th>Protocol</th><th>Category</th><th>Chains</th>
+        <th class="num">TVL</th><th class="num">7d</th><th class="num">Implied value</th>
+        <th class="num">Multiple</th><th class="num">Age</th>
+      </tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+
+  <section id="detail" class="panel detail" hidden></section>
+
+  <footer>
+    <p>Source: DefiLlama snapshot, 14 November 2026. Implied value is a model estimate, not a price target.</p>
+  </footer>
+</div>
+<script src="radar-data.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
